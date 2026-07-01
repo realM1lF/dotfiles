@@ -1,0 +1,7 @@
+# Backup files created by workspace-setup.sh and similar tools
+*.bak
+*.bak.*
+
+# SSH private keys and host history
+ssh/.ssh/id_ed25519
+ssh/.ssh/known_hosts.old
