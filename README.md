@@ -30,12 +30,20 @@ cd ~/dotfiles
 
 This repository contains the following stow packages:
 
-- **hyprland** - Hyprland window manager configuration
-- **waybar** - Waybar status bar configuration
+- **hyprland** - Hyprland window manager configuration (Lua format, Omarchy 4)
+- **agents** - Agent skills for `~/.agents/skills/` (e.g. `omarchy-custom`)
 - **ssh** - SSH configuration
 - **opendeck** - OpenDeck configuration
-- **omarchy** - Omarchy configuration
+- **kanshi** - Kanshi configuration (currently not in use)
 - **scripts** - User scripts in `~/.local/bin/` (e.g. fingerprint toggle)
+
+### `_old/` — Omarchy 3 leftovers (do NOT stow)
+
+Everything in `_old/` is kept for reference only and is not a stow package:
+
+- `_old/hyprland/` — old `.conf` Hyprland config (Omarchy 3). Omarchy 4 uses Lua (`*.lua`); the `*.conf` files are no longer read.
+- `_old/waybar/` — Waybar config. Omarchy 4 replaced Waybar with the Quickshell-based Omarchy shell.
+- `_old/omarchy/` — custom themes in the old Omarchy 3 format (waybar.css, mako.ini, ...). Omarchy 4 uses a new theme format.
 
 ### System Files (require root — not stow-managed)
 
@@ -59,8 +67,8 @@ To symlink a specific package, run the following command from the `~/dotfiles` d
 # Hyprland configuration
 stow hyprland
 
-# Waybar configuration
-stow waybar
+# Agent skills
+stow agents
 
 # SSH configuration
 stow ssh
@@ -68,16 +76,16 @@ stow ssh
 # OpenDeck configuration
 stow opendeck
 
-# Omarchy configuration
-stow omarchy
+# Kanshi configuration
+stow kanshi
 ```
 
 ### Installing All Packages
 
-To install all packages at once:
+To install all packages at once (list them explicitly — do NOT use `stow */`, because `_old/` must never be stowed):
 
 ```bash
-stow */
+stow hyprland agents ssh opendeck kanshi scripts
 ```
 
 ### Uninstalling Packages
@@ -88,8 +96,8 @@ To remove symlinks for a specific package:
 # Example: uninstall hyprland
 stow -D hyprland
 
-# Example: uninstall waybar
-stow -D waybar
+# Example: uninstall agents
+stow -D agents
 
 # Example: uninstall ssh
 stow -D ssh
@@ -97,14 +105,14 @@ stow -D ssh
 # Example: uninstall opendeck
 stow -D opendeck
 
-# Example: uninstall omarchy
-stow -D omarchy
+# Example: uninstall kanshi
+stow -D kanshi
 ```
 
 To uninstall all packages:
 
 ```bash
-stow -D */
+stow -D hyprland agents ssh opendeck kanshi scripts
 ```
 
 ### Restowing Packages
@@ -116,7 +124,7 @@ If you've made changes and want to refresh the symlinks:
 stow -R hyprland
 
 # Restow all packages
-stow -R */
+stow -R hyprland agents ssh opendeck kanshi scripts
 ```
 
 ### Dry Run
@@ -128,7 +136,7 @@ To see what stow would do without actually making changes:
 stow -n hyprland
 
 # Dry run for all packages
-stow -n */
+stow -n hyprland agents ssh opendeck kanshi scripts
 ```
 
 ## Directory Structure
@@ -137,26 +145,30 @@ stow -n */
 dotfiles/
 ├── hyprland/
 │   └── .config/
-│       └── hypr/
-├── waybar/
-│   └── .config/
-│       └── waybar/
+│       └── hypr/           # Lua config: bindings.lua, monitors.lua, autostart.lua + scripts/
+├── agents/
+│   └── .agents/
+│       └── skills/         # stow → ~/.agents/skills/
 ├── ssh/
 │   └── .ssh/
 │       └── config
 ├── opendeck/
 │   └── .config/
 │       └── opendeck/
-├── omarchy/
+├── kanshi/
 │   └── .config/
-│       └── omarchy/
+│       └── kanshi/
 ├── scripts/
 │   └── .local/
-│       └── bin/          # stow → ~/.local/bin/
-└── system/               # NOT stow-managed — install with system/install.sh
-    ├── install.sh
-    ├── usr/local/bin/
-    └── etc/sudoers.d/
+│       └── bin/            # stow → ~/.local/bin/
+├── system/                 # NOT stow-managed — install with system/install.sh
+│   ├── install.sh
+│   ├── usr/local/bin/
+│   └── etc/sudoers.d/
+└── _old/                   # Omarchy 3 leftovers, reference only — NEVER stow
+    ├── hyprland/           # old .conf format
+    ├── waybar/             # Waybar (removed in Omarchy 4)
+    └── omarchy/            # themes in old format
 ```
 
 ## Notes

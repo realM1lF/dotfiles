@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# shellcheck disable=SC2016
 #
 # workspace-setup.sh – Hyprland Monitor-Layout für work/home umschalten.
+#
+# Schreibt ~/.config/hypr/monitors.lua (Lua-Config, Omarchy 4) und lädt
+# Hyprland neu. Die Datei ist ein Symlink ins dotfiles-Repo – Änderungen
+# am Layout daher hier im Skript machen, nicht in monitors.lua.
 #
 # Ohne Argument wird automatisch erkannt, welches Layout passt:
 #   - Beide LG-Portrait-Monitore angeschlossen  → work
@@ -13,7 +16,7 @@
 
 set -euo pipefail
 
-MONITOR_CONF="${HOME}/.config/hypr/monitors.conf"
+MONITORS_LUA="${HOME}/.config/hypr/monitors.lua"
 
 LG_LEFT_SERIAL="0x0003E9A7"
 LG_RIGHT_SERIAL="0x00030432"
@@ -69,37 +72,53 @@ if [[ "$MODE" == "auto" ]]; then
     log "Auto-Detection: ${MODE}"
 fi
 
+header() {
+    cat <<EOF
+-- Managed by workspace-setup.sh -- do not edit manually.
+-- Regenerate: ~/.config/hypr/scripts/workspace-setup.sh [work|home|auto]
+-- Current layout: ${MODE}
+
+local omarchy_gdk_scale = 2
+hl.env("GDK_SCALE", tostring(omarchy_gdk_scale))
+
+EOF
+}
+
+footer() {
+    cat <<'EOF'
+
+-- Fallback for unknown monitors
+hl.monitor({ output = "", mode = "preferred", position = "auto", scale = 1 })
+EOF
+}
+
 case "$MODE" in
     work)
-        log "Wende work-Layout an (3 Monitore)."
-        cat > "$MONITOR_CONF" <<'EOF'
-# Hyprland Monitor Configuration
-# Managed by workspace-setup.sh
-
-monitor=desc:LG Electronics LG HDR 4K 0x0003E9A7,3840x2160@60.00,0x0,1.50,transform,1
-monitor=desc:Xiaomi Corporation Mi Monitor 0000000000000,3440x1440@50.00,1440x0,1
-monitor=desc:LG Electronics LG HDR 4K 0x00030432,3840x2160@60.00,4880x0,1.50,transform,1
-monitor=eDP-1,1920x1200@60.00,6320x0,1
-
-# Fallback for unknown monitors
-monitor=,preferred,auto,1
+        log "Wende work-Layout an (3 Monitore + Laptop)."
+        {
+            header
+            cat <<'EOF'
+hl.monitor({ output = "desc:LG Electronics LG HDR 4K 0x0003E9A7", mode = "3840x2160@60.00", position = "0x0", scale = 1.50, transform = 1 })
+hl.monitor({ output = "desc:Xiaomi Corporation Mi Monitor 0000000000000", mode = "3440x1440@50.00", position = "1440x0", scale = 1 })
+hl.monitor({ output = "desc:LG Electronics LG HDR 4K 0x00030432", mode = "3840x2160@60.00", position = "4880x0", scale = 1.50, transform = 1 })
+hl.monitor({ output = "eDP-1", mode = "1920x1200@60.00", position = "6320x0", scale = 1 })
 EOF
+            footer
+        } > "$MONITORS_LUA"
         ;;
 
     home)
         log "Wende home-Layout an (Laptop + Xiaomi)."
-        cat > "$MONITOR_CONF" <<'EOF'
-# Hyprland Monitor Configuration
-# Managed by workspace-setup.sh
-
-monitor=eDP-1,1920x1200@60.00,0x0,1
-monitor=desc:Xiaomi Corporation Mi Monitor 0000000000000,3440x1440@50.00,1920x0,1
-monitor=desc:LG Electronics LG HDR 4K 0x00030432,disable
-monitor=desc:LG Electronics LG HDR 4K 0x0003E9A7,disable
-
-# Fallback for unknown monitors
-monitor=,preferred,auto,1
+        {
+            header
+            cat <<'EOF'
+hl.monitor({ output = "eDP-1", mode = "1920x1200@60.00", position = "0x0", scale = 1 })
+hl.monitor({ output = "desc:Xiaomi Corporation Mi Monitor 0000000000000", mode = "3440x1440@50.00", position = "1920x0", scale = 1 })
+hl.monitor({ output = "desc:LG Electronics LG HDR 4K 0x00030432", disabled = true })
+hl.monitor({ output = "desc:LG Electronics LG HDR 4K 0x0003E9A7", disabled = true })
 EOF
+            footer
+        } > "$MONITORS_LUA"
         ;;
 
     *)
@@ -111,19 +130,5 @@ esac
 
 log "Lade Hyprland-Config neu..."
 hyprctl reload
-
-# waybar neu starten, damit die Monitor-Anzeige passt.
-# Beim initialen Hyprland-Start startet die Omarchy-Default-Autostart Waybar
-# asynchron ueber uwsm-app. Ein sofortiges "omarchy restart waybar" greift dann
-# noch ins Leere und erzeugt eine zweite Instanz. Daher nur restarten, wenn
-# Waybar bereits laeuft (z. B. bei manuellem work/home-Wechsel).
-if command -v omarchy >/dev/null 2>&1; then
-    if pgrep -x waybar >/dev/null 2>&1; then
-        log "Starte waybar neu..."
-        omarchy restart waybar >/dev/null 2>&1 || true
-    else
-        log "Waybar laeuft noch nicht - ueberspringe Restart (Autostart uebernimmt)."
-    fi
-fi
 
 log "Fertig."

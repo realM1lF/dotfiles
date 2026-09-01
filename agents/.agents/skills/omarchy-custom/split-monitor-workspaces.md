@@ -1,4 +1,4 @@
-# split-monitor-workspaces – Hyprland Plugin
+# split-monitor-workspaces – Workspace-Split pro Monitor
 
 ## Quelle
 
@@ -6,90 +6,72 @@
 
 ## Was macht es?
 
-Das Plugin erzeugt pro physischem Monitor eigene Workspace-Gruppen. Mit 3 Monitoren und `count = 10` bekommt jeder Monitor 10 Workspaces (1–10, 11–20, 21–30). Das verhindert, dass Workspaces beim Monitor-Wechsel automatisch mitwandern.
+Jeder physische Monitor bekommt eigene Workspace-Gruppen. Mit 2 Monitoren und `workspace_count = 10` hat Monitor 1 die Workspaces 1–10, Monitor 2 die 11–20. Workspaces wandern beim Monitor-Wechsel nicht mit.
+
+## Wichtig: Seit Omarchy 4 als Lua-Package
+
+Omarchy 4 nutzt die Lua-Config von Hyprland (`hyprland.lua`). Das Plugin existiert dafür als **Lua-Package** – das alte C++-Plugin (`.so`, kompilieren, ABI-Probleme) ist damit hinfällig. Das alte Vorgehen liegt in [old/](./old/) (siehe `quattro-update-recovery.md`).
 
 ## Installation
 
 | Komponente | Pfad |
 |------------|------|
-| Plugin-Binary | `~/.config/hypr/plugins/libsplit-monitor-workspaces.so` |
-| Hyprland-Config | `~/dotfiles/hyprland/.config/hypr/hyprland.conf` (via Symlink) |
+| Lua-Package (git-Clone, Branch `release/0.56.x`) | `~/.config/hypr/plugins/split-monitor-workspaces` |
+| Einbindung + Bindings | `~/dotfiles/hyprland/.config/hypr/bindings.lua` (via Symlink) |
 
-### Plugin laden (in `hyprland.conf` + Autostart-Fallback)
-
-**Primär** — ganz oben in `hyprland.conf`, mit **absolutem Pfad** (kein `~`):
-
-```conf
-plugin = /home/rin/.config/hypr/plugins/libsplit-monitor-workspaces.so
+```bash
+git clone https://github.com/zjeffer/split-monitor-workspaces \
+  ~/.config/hypr/plugins/split-monitor-workspaces
+cd ~/.config/hypr/plugins/split-monitor-workspaces
+git checkout release/0.56.x   # Branch passend zur Hyprland-Version (0.56.x bei Hyprland 0.56.2)
 ```
 
-**Fallback** — in `autostart.conf`, weil `plugin =` beim Kaltstart manchmal nicht greift:
+Der Clone liegt **nicht** im dotfiles-Repo. Bei einem Hyprland-Minor-Update: `git pull` im Plugin-Verzeichnis; bei neuem Major-Release (0.57, ...) auf den passenden `release/0.XX.x`-Branch wechseln.
 
-```conf
-exec-once = ~/.config/hypr/scripts/load-split-monitor-workspaces.sh
+## Einbindung in `bindings.lua`
+
+```lua
+package.path = package.path .. ";./?.lua;./?/init.lua"
+local smw_ok, smw = pcall(require, "plugins.split-monitor-workspaces")
 ```
 
-Das Script prüft, ob das Plugin geladen ist; falls nicht: laden + `hyprctl reload`.
+Der `pcall` ist Absicht: Fehlt das Package, bleiben die Omarchy-Default-Bindings aktiv und es gibt nur eine Notification statt einer kaputten Config.
 
-**Nicht** `exec-once = hyprctl plugin load …` allein und **nicht** `hyprpm reload -n` ohne eingerichtetes hyprpm (schlägt sonst still fehl).
-
-### Plugin-Binary (lokal, nicht in dotfiles)
-
-Das `.so` liegt nur unter `~/.config/hypr/plugins/` und wird **nicht** ins dotfiles-Repo committed. Nach jedem Hyprland-Update ggf. neu bauen (siehe Troubleshooting).
-
-## Konfiguration (in `hyprland.conf`)
-
-```conf
-plugin {
-    split-monitor-workspaces {
-        count = 10                       # Workspaces pro Monitor
-        keep_focused = 0                 # Fokus nach Reload beibehalten
-        enable_notifications = 1         # Popup-Notifications an
-        enable_persistent_workspaces = 1 # Workspaces immer erstellen
-        enable_wrapping = 0              # Kein Wrap-around
-    }
-}
-```
-
-### Was die Optionen bedeuten
+## Konfiguration (`smw.setup`)
 
 | Option | Wert | Bedeutung |
 |--------|------|-----------|
-| `count` | `10` | Jeder Monitor bekommt 10 Workspaces |
-| `keep_focused` | `0` | Nach `hyprctl reload` wird der Fokus nicht explizit gesetzt |
-| `enable_notifications` | `1` | Zeigt Benachrichtigungen bei Workspace-Wechsel |
-| `enable_persistent_workspaces` | `1` | Workspaces werden sofort beim Start erstellt, nicht erst bei Bedarf |
-| `enable_wrapping` | `0` | Beim Erreichen des letzten Workspaces wird nicht wieder beim ersten angefangen |
+| `workspace_count` | `10` | Workspaces pro Monitor |
+| `keep_focused` | `false` | Fokus nach Reload nicht explizit setzen |
+| `enable_notifications` | `true` | Popup bei Workspace-Wechsel |
+| `enable_persistent_workspaces` | `true` | Alle Workspaces sofort erstellen |
+| `enable_wrapping` | `false` | Kein Wrap-around beim Cyclen |
 
-## Wichtige Hinweise
+## Bindings (in `bindings.lua`)
 
-- Die `libsplit-monitor-workspaces.so` muss zur installierten Hyprland-Version passen (ABI-Kompatibilität, z. B. `libhyprutils.so.12` vs `.13`)
-- Nach einem Hyprland-Update: Plugin neu bauen (siehe unten)
-- Stand Aug 2026: Hyprland **0.56.2**, Plugin-Commit `b28df0d` (hyprpm-Pin für 0.56.2)
+| Binding | Aktion |
+|---------|--------|
+| `SUPER + 1..0` | Workspace 1–10 auf dem aktuellen Monitor |
+| `SUPER SHIFT + 1..0` | Fenster dorthin verschieben (silent) |
+| `SUPER + TAB` / `SUPER SHIFT + TAB` | Nächster/vorheriger Workspace (dieser Monitor) |
+| `SUPER SHIFT + N` / `SUPER SHIFT + M` | Fokus nächster/vorheriger Monitor (Standard-Dispatcher `focus monitor ±1`) |
+
+Vorher werden die Omarchy-Defaults entbunden: `SUPER + code:10..19`, `SUPER SHIFT + code:10..19`, `SUPER + TAB`, `SUPER SHIFT + TAB`. Außerdem `SUPER SHIFT + N` (Default: Editor) und `SUPER SHIFT + M` (Default: Music).
+
+## Verifikation
+
+```bash
+hyprctl configerrors      # muss leer sein
+hyprctl workspaces        # persistente Workspaces 1–10 pro Monitor sichtbar
+hyprctl binds | grep -A6 "this monitor"
+```
+
+> Hinweis: Lua-gebundene Dispatcher erscheinen in `hyprctl binds` als `dispatcher: __lua` – das ist normal.
 
 ## Troubleshooting
 
 | Problem | Lösung |
 |---------|--------|
-| Config error: `Invalid dispatcher "split-workspace"` | Plugin nicht geladen → `hyprctl plugin list` prüfen, Binary neu bauen |
-| Plugin lädt nicht: `libhyprutils.so.12: cannot open shared object file` | Binary veraltet (ABI-Mismatch nach hyprutils-Update) → neu bauen |
-| Plugin lädt nicht (sonst) | `hyprctl plugin list` – ggf. neu bauen |
-| Workspaces wandern trotzdem | `enable_persistent_workspaces = 1` setzen |
-| Crash nach Update | Plugin-Version muss zur Hyprland-Version passen |
-
-### Plugin neu bauen (manuell)
-
-Hyprland-Version und passenden Commit aus `hyprpm.toml` im Plugin-Repo nachschlagen (Pin für 0.56.2: `b28df0d`):
-
-```bash
-cd /tmp
-git clone https://github.com/zjeffer/split-monitor-workspaces
-cd split-monitor-workspaces
-git fetch --depth 1 origin b28df0d0df6bc8b07389552c38f645bbba13008b
-git checkout b28df0d0df6bc8b07389552c38f645bbba13008b
-meson setup build --wipe && meson compile -C build
-cp build/libsplit-monitor-workspaces.so ~/.config/hypr/plugins/
-hyprctl reload
-```
-
-Alternativ: `sudo hyprpm purge-cache && hyprpm update && hyprpm add … && hyprpm enable split-monitor-workspaces && hyprpm reload -n`
+| Workspace-Bindings tot, Defaults aktiv | Package fehlt/Requirement-Fehler → `hyprctl configerrors`, Clone + Branch prüfen |
+| Nach Hyprland-Update seltsames Verhalten | `git -C ~/.config/hypr/plugins/split-monitor-workspaces pull`, ggf. Branch wechseln |
+| Workspaces wandern trotzdem | `enable_persistent_workspaces = true` gesetzt? |
