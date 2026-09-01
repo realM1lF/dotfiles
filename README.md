@@ -31,6 +31,7 @@ cd ~/dotfiles
 This repository contains the following stow packages:
 
 - **hyprland** - Hyprland window manager configuration (Lua format, Omarchy 4)
+- **omarchy** - Omarchy shell plugins (`~/.config/omarchy/plugins/`)
 - **agents** - Agent skills for `~/.agents/skills/` (e.g. `omarchy-custom`)
 - **ssh** - SSH configuration
 - **opendeck** - OpenDeck configuration
@@ -76,6 +77,9 @@ stow ssh
 # OpenDeck configuration
 stow opendeck
 
+# Omarchy shell plugins
+stow omarchy
+
 # Kanshi configuration
 stow kanshi
 ```
@@ -85,7 +89,7 @@ stow kanshi
 To install all packages at once (list them explicitly — do NOT use `stow */`, because `_old/` must never be stowed):
 
 ```bash
-stow hyprland agents ssh opendeck kanshi scripts
+stow hyprland omarchy agents ssh opendeck kanshi scripts
 ```
 
 ### Uninstalling Packages
@@ -112,7 +116,7 @@ stow -D kanshi
 To uninstall all packages:
 
 ```bash
-stow -D hyprland agents ssh opendeck kanshi scripts
+stow -D hyprland omarchy agents ssh opendeck kanshi scripts
 ```
 
 ### Restowing Packages
@@ -124,7 +128,7 @@ If you've made changes and want to refresh the symlinks:
 stow -R hyprland
 
 # Restow all packages
-stow -R hyprland agents ssh opendeck kanshi scripts
+stow -R hyprland omarchy agents ssh opendeck kanshi scripts
 ```
 
 ### Dry Run
@@ -136,7 +140,7 @@ To see what stow would do without actually making changes:
 stow -n hyprland
 
 # Dry run for all packages
-stow -n hyprland agents ssh opendeck kanshi scripts
+stow -n hyprland omarchy agents ssh opendeck kanshi scripts
 ```
 
 ## Directory Structure
@@ -155,6 +159,10 @@ dotfiles/
 ├── opendeck/
 │   └── .config/
 │       └── opendeck/
+├── omarchy/
+│   └── .config/
+│       └── omarchy/
+│           └── plugins/    # user shell plugins (e.g. rin.workspaces)
 ├── kanshi/
 │   └── .config/
 │       └── kanshi/

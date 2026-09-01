@@ -26,6 +26,14 @@ Nicht gesymlinkt (bleiben lokale Omarchy-Dateien): `hyprland.lua`, `input.lua`, 
 |---------|----------------------|
 | `~/.ssh/config` | `ssh/.ssh/config` |
 
+## Omarchy Shell-Plugins (`~/dotfiles/omarchy/`)
+
+| Symlink | Ziel in `~/dotfiles/` |
+|---------|----------------------|
+| `~/.config/omarchy/plugins/rin.workspaces` | `omarchy/.config/omarchy/plugins/rin.workspaces` |
+
+Details: [workspaces-widget.md](./workspaces-widget.md). Hinweis: `~/.config/omarchy/shell.json` ist **kein** Symlink und nicht im Repo.
+
 ## Agent-Skills (`~/dotfiles/agents/`)
 
 | Symlink | Ziel in `~/dotfiles/` |

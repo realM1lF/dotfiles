@@ -19,6 +19,7 @@ Jedes Thema hat eine eigene Datei im selben Verzeichnis:
 |-------|-------|
 | [workspace-setup.md](./workspace-setup.md) | Auto-Switch zwischen work- und home-Monitor-Layout (schreibt `monitors.lua`), F7/F8-Bindings |
 | [split-monitor-workspaces.md](./split-monitor-workspaces.md) | Lua-Package für getrennte Workspaces pro Monitor + Workspace-Bindings |
+| [workspaces-widget.md](./workspaces-widget.md) | Bar-Widget `rin.workspaces`: Workspaces pro Monitor + aktives Highlight |
 | [dotfiles.md](./dotfiles.md) | Stow-Symlinks von `~/.config/` zum `~/dotfiles/`-Repo |
 
 ## Archiv (`old/`)
