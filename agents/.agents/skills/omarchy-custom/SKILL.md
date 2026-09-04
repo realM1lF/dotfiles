@@ -20,7 +20,11 @@ Jedes Thema hat eine eigene Datei im selben Verzeichnis:
 | [workspace-setup.md](./workspace-setup.md) | Auto-Switch zwischen work- und home-Monitor-Layout (schreibt `monitors.lua`), F7/F8-Bindings |
 | [split-monitor-workspaces.md](./split-monitor-workspaces.md) | Lua-Package für getrennte Workspaces pro Monitor + Workspace-Bindings |
 | [workspaces-widget.md](./workspaces-widget.md) | Bar-Widget `rin.workspaces`: Workspaces pro Monitor + aktives Highlight |
+| [at-sign-binding.md](./at-sign-binding.md) | Cmd+Q tippt `@` via `send_key_state` (Keychron K4 Mac-Modus hat kein AltGr) |
 | [dotfiles.md](./dotfiles.md) | Stow-Symlinks von `~/.config/` zum `~/dotfiles/`-Repo |
+| [rins-theme.md](./rins-theme.md) | User-Theme `Rins`: 1:1-Fork von Stock-Theme Solitude |
+| [hermes.md](./hermes.md) | Hermes Desktop (Nous): User-Space unter `~/.hermes/`, XDG-Launcher |
+| [rin-companion.md](./rin-companion.md) | Haus-Agent: Bar-Widget `rin.companion`, rules/soul/user/memory, Chat + Float |
 
 ## Archiv (`old/`)
 

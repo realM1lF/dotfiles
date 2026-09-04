@@ -31,7 +31,7 @@ cd ~/dotfiles
 This repository contains the following stow packages:
 
 - **hyprland** - Hyprland window manager configuration (Lua format, Omarchy 4)
-- **omarchy** - Omarchy shell plugins (`~/.config/omarchy/plugins/`)
+- **omarchy** - Omarchy shell plugins (`~/.config/omarchy/plugins/`: `rin.workspaces`, `rin.companion`)
 - **agents** - Agent skills for `~/.agents/skills/` (e.g. `omarchy-custom`)
 - **ssh** - SSH configuration
 - **opendeck** - OpenDeck configuration

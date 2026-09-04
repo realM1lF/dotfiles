@@ -7,17 +7,20 @@ Das `~/dotfiles/`-Repo ist die Quelle für diverse Konfigurationen in `~/` (GNU 
 | Symlink in `~/.config/hypr/` | Ziel in `~/dotfiles/` |
 |------------------------------|----------------------|
 | `bindings.lua` | `hyprland/.config/hypr/bindings.lua` |
-| `monitors.lua` | `hyprland/.config/hypr/monitors.lua` |
+| `monitors.lua` | Quelle im Repo; **aktuell lokal** (`~/.config/hypr/monitors.lua` ist kein Symlink, workspace-setup schreibt lokal) |
 | `autostart.lua` | `hyprland/.config/hypr/autostart.lua` |
+| `companion.lua` | `hyprland/.config/hypr/companion.lua` |
 | `scripts` | `hyprland/.config/hypr/scripts` |
 
 Nicht gesymlinkt (bleiben lokale Omarchy-Dateien): `hyprland.lua`, `input.lua`, `looknfeel.lua`, `hyprsunset.conf`, `xdph.conf`.
+
+`hyprland.lua` braucht eine Zeile `require("hypr.companion")` (Haus-Agent-Float). Siehe [rin-companion.md](./rin-companion.md).
 
 ### Wichtige Edits in diesen Dateien
 
 - **monitors.lua** → wird von `workspace-setup.sh` generiert, siehe [workspace-setup.md](./workspace-setup.md)
 - **autostart.lua** → Auto-Start von `workspace-setup.sh auto`
-- **bindings.lua** → split-monitor-workspaces Setup + Workspace-Bindings + F7/F8, siehe [split-monitor-workspaces.md](./split-monitor-workspaces.md) und [workspace-setup.md](./workspace-setup.md)
+- **bindings.lua** → split-monitor-workspaces Setup + Workspace-Bindings + F7/F8 + `SUPER+SHIFT+A` Companion (statt ChatGPT), siehe [split-monitor-workspaces.md](./split-monitor-workspaces.md), [workspace-setup.md](./workspace-setup.md) und [rin-companion.md](./rin-companion.md)
 - **scripts/workspace-setup.sh** → Monitor-Layout-Umschaltung, siehe [workspace-setup.md](./workspace-setup.md)
 
 ## SSH (`~/dotfiles/ssh/`)
@@ -31,8 +34,9 @@ Nicht gesymlinkt (bleiben lokale Omarchy-Dateien): `hyprland.lua`, `input.lua`, 
 | Symlink | Ziel in `~/dotfiles/` |
 |---------|----------------------|
 | `~/.config/omarchy/plugins/rin.workspaces` | `omarchy/.config/omarchy/plugins/rin.workspaces` |
+| `~/.config/omarchy/plugins/rin.companion` | `omarchy/.config/omarchy/plugins/rin.companion` |
 
-Details: [workspaces-widget.md](./workspaces-widget.md). Hinweis: `~/.config/omarchy/shell.json` ist **kein** Symlink und nicht im Repo.
+Details: [workspaces-widget.md](./workspaces-widget.md), [rin-companion.md](./rin-companion.md). Hinweis: `~/.config/omarchy/shell.json` ist **kein** Symlink und nicht im Repo.
 
 ## Agent-Skills (`~/dotfiles/agents/`)
 

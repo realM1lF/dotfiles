@@ -14,15 +14,27 @@ BarWidget {
   moduleName: "rin.workspaces"
 
   // Name of the screen this bar instance lives on (one bar per monitor).
-  readonly property string screenName: {
-    var win = root.QsWindow ? root.QsWindow.window : null
-    return win && win.screen ? String(win.screen.name || "") : ""
+  // NOTE: QsWindow attached-property bindings on the widget itself are
+  // unreliable here (widgets may be created before being parented into their
+  // per-monitor BarPanel, and the binding does not re-evaluate). Instead we
+  // ask the bar host which slot this widget instance lives in — slots are
+  // statically created inside each per-monitor BarPanel, so their window is
+  // always correct.
+  function screenName() {
+    if (!root.bar) return ""
+    var slots = root.bar.moduleSlots || []
+    for (var i = 0; i < slots.length; i++) {
+      var slot = slots[i]
+      if (slot && slot.activeItem === root) return root.bar.slotScreenName(slot)
+    }
+    return ""
   }
 
   function screenMonitor() {
+    var name = root.screenName()
     var monitors = Hyprland.monitors.values
     for (var i = 0; i < monitors.length; i++) {
-      if (String(monitors[i].name) === root.screenName) return monitors[i]
+      if (String(monitors[i].name) === name) return monitors[i]
     }
     return null
   }
@@ -32,15 +44,16 @@ BarWidget {
   // monitor are always present. Fallback while the window is not attached
   // yet (screenName unknown): workspaces 1-10, like the stock widget.
   function workspaces() {
+    var screen = root.screenName()
     var result = []
     var values = Hyprland.workspaces.values
     for (var i = 0; i < values.length; i++) {
       var ws = values[i]
       if (ws.id <= 0) continue // skip special workspaces (scratchpad etc.)
       var mon = ws.monitor
-      if (root.screenName === "") {
+      if (screen === "") {
         if (ws.id <= 10) result.push(ws)
-      } else if (mon && String(mon.name) === root.screenName) {
+      } else if (mon && String(mon.name) === screen) {
         result.push(ws)
       }
     }
@@ -55,6 +68,7 @@ BarWidget {
   }
 
   function focusWorkspace(id) {
+    console.log("rin.workspaces click: id=", id, "screen=", root.screenName())
     if (!root.bar) return
     root.bar.run("hyprctl dispatch " + Util.shellQuote("hl.dsp.focus({ workspace = \"" + id + "\" })"))
   }

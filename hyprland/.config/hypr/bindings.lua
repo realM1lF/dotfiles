@@ -55,8 +55,28 @@ else
     "notify-send -u critical Hyprland 'split-monitor-workspaces Lua package missing: ~/.config/hypr/plugins/split-monitor-workspaces'")
 end
 
+-- Type @ with Cmd + Q (Keychron K4 in Mac mode has no right Option/AltGr key:
+-- right of the spacebar there is only Command/Super, fn, Control, so AltGr+Q
+-- is impossible in Mac mode). Injects MOD5+Q (= @ on the de layout) via
+-- send_key_state with explicit mods. A virtual keyboard (wtype) won't do: the
+-- physically held modifier merges into the injected chord at the seat (same
+-- reasoning as default/hypr/bindings/clipboard.lua). The down/up split avoids
+-- stuck/repeating synthetic key state.
+local function send_at_once()
+  hl.dispatch(hl.dsp.send_key_state({ mods = "MOD5", key = "Q", state = "down" }))
+  hl.timer(function()
+    hl.dispatch(hl.dsp.send_key_state({ mods = "MOD5", key = "Q", state = "up" }))
+  end, { timeout = 50, type = "oneshot" })
+end
+hl.bind("SUPER + Q", send_at_once, { description = "Type @" })
+
 -- Monitor layouts: SUPER+F7 = work (3 monitors + laptop), SUPER+F8 = home (laptop + Xiaomi).
 o.bind("SUPER + F7", "Work monitor layout",
   os.getenv("HOME") .. "/.config/hypr/scripts/workspace-setup.sh work")
 o.bind("SUPER + F8", "Home monitor layout",
   os.getenv("HOME") .. "/.config/hypr/scripts/workspace-setup.sh home")
+
+-- Companion TUI. Overrides Omarchy default (ChatGPT webapp).
+hl.unbind("SUPER + SHIFT + A")
+o.bind("SUPER + SHIFT + A", "Companion",
+  os.getenv("HOME") .. "/.config/omarchy/plugins/rin.companion/toggle.sh")

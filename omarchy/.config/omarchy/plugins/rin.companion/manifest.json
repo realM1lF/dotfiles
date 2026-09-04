@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "rin.companion",
+  "name": "Companion",
+  "version": "0.1.0",
+  "author": "rin",
+  "description": "Haus-Agent: Panel für soul/user/memory, Rechtsklick öffnet den Agent-Float",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Companion",
+    "description": "Panel + Haus-Agent auf special:companion",
+    "category": "AI",
+    "allowMultiple": false,
+    "defaultSection": "left"
+  }
+}
